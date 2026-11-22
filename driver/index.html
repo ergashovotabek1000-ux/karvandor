@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Karvandor — Haydovchi</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F4F5F7;
+  --card:#ffffff;
+  --border:#E4E4E7;
+  --text:#111111;
+  --secondary:#6B7280;
+  --green:#059669;
+  --yellow:#F59E0B;
+  --red:#DC2626;
+  --blue:#2563EB;
+  --radius:16px;
+  --bottom-bar:64px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom-bar)+16px)}
+
+/* TOP BAR */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-logo{font-size:16px;font-weight:800;color:var(--text)}
+.topbar-logo span{color:var(--secondary);font-weight:400;font-size:13px;margin-left:4px}
+.notif-btn{position:relative;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff;display:none}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--border);
+  display:flex;height:var(--bottom-bar);z-index:50;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--secondary);font-size:11px;font-weight:500;transition:color .15s}
+.nav-item.active{color:var(--text)}
+.nav-icon{font-size:22px;line-height:1}
+.nav-active-dot{width:4px;height:4px;border-radius:50%;background:var(--text);display:none}
+.nav-item.active .nav-active-dot{display:block}
+
+/* CONTENT */
+.content{padding:0}
+.page{display:none;padding:16px}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.card-title-icon{font-size:16px;margin-right:6px}
+
+/* ALERT CARD */
+.alert-card{
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.alert-yellow{background:#FFFBEB;border:1.5px solid #F59E0B;animation:pulse-y 2s infinite}
+.alert-green{background:#ECFDF5;border:1.5px solid #059669}
+.alert-blue{background:#EFF6FF;border:1.5px solid #2563EB}
+@keyframes pulse-y{0%,100%{box-shadow:0 0 0 0 #FDE68A}50%{box-shadow:0 0 0 6px #FEF3C7}}
+.alert-icon{font-size:24px;flex-shrink:0}
+.alert-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.alert-body{font-size:12px;color:var(--secondary);line-height:1.4}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat-box-val{font-size:22px;font-weight:800;color:var(--text);line-height:1}
+.stat-box-label{font-size:11px;color:var(--secondary);margin-top:3px}
+
+/* TRIP PROGRESS */
+.trip-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:12px;
+}
+.trip-route{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.trip-meta{font-size:12px;color:var(--secondary);margin-bottom:12px}
+.progress-bar{height:8px;background:#F3F4F6;border-radius:4px;overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s;background:var(--blue)}
+.progress-fill.yellow{background:var(--yellow)}
+.progress-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--secondary)}
+
+/* BUTTON */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;width:100%;transition:.15s}
+.btn-black{background:#111;color:#fff}
+.btn-black:active{background:#333}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn-outline:active{background:#F3F4F6}
+.btn-green{background:#059669;color:#fff}
+.btn-green:active{background:#047857}
+.btn-yellow{background:#F59E0B;color:#fff}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:9px;width:auto;display:inline-flex}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+
+/* FORM */
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:5px}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;color:var(--text);outline:none;background:#fff;-webkit-appearance:none}
+.form-input:focus{border-color:#111}
+select.form-input{cursor:pointer}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-hint{font-size:11px;color:var(--secondary);margin-top:4px}
+
+/* PHOTO UPLOAD */
+.photo-upload{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:20px;text-align:center;cursor:pointer;transition:.15s;
+  position:relative;overflow:hidden;
+}
+.photo-upload:active{border-color:#111;background:#F9FAFB}
+.photo-upload-preview{
+  width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;margin:0 auto;
+}
+.photo-upload-icon{font-size:36px;margin-bottom:8px}
+.photo-upload-text{font-size:13px;font-weight:600;color:var(--text)}
+.photo-upload-hint{font-size:11px;color:var(--secondary);margin-top:3px}
+.photo-upload-change{font-size:12px;color:var(--blue);margin-top:8px;font-weight:600}
+
+/* MULTI PHOTO */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.photo-thumb{
+  aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;
+  background:#F3F4F6;border:1px solid var(--border);cursor:pointer;
+}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-thumb-add{display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--secondary)}
+.photo-thumb-del{
+  position:absolute;top:4px;right:4px;width:20px;height:20px;
+  background:rgba(220,38,38,.85);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  cursor:pointer;
+}
+
+/* DOC ITEM */
+.doc-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;border-bottom:1px solid #F3F4F6;
+}
+.doc-item:last-child{border-bottom:none}
+.doc-status-icon{font-size:20px;flex-shrink:0;width:28px;text-align:center}
+.doc-info{flex:1}
+.doc-name{font-size:13px;font-weight:600;color:var(--text)}
+.doc-expiry{font-size:11px;margin-top:1px}
+.doc-upload-area{
+  margin-top:8px;border:1.5px dashed var(--border);border-radius:10px;
+  padding:10px;text-align:center;cursor:pointer;display:none;
+}
+.doc-upload-area.open{display:block}
+.doc-upload-preview{width:60px;height:60px;border-radius:8px;object-fit:cover}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:#D1FAE5;color:#059669}
+.badge-yellow{background:#FEF3C7;color:#D97706}
+.badge-red{background:#FEE2E2;color:#DC2626}
+.badge-blue{background:#DBEAFE;color:#2563EB}
+.badge-gray{background:#F3F4F6;color:#6B7280}
+
+/* SECTION HEADER */
+.section-header{font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px}
+
+/* ORDER ITEM */
+.order-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.order-route{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.order-detail{font-size:12px;color:var(--secondary)}
+.order-price{font-size:16px;font-weight:800;color:var(--green);margin-top:6px}
+.order-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+
+/* RATING */
+.stars{display:flex;gap:3px}
+.star{font-size:24px;cursor:pointer;transition:.1s;color:#E4E4E7}
+.star.on{color:#F59E0B}
+
+/* PROFILE AVATAR */
+.profile-avatar{
+  width:72px;height:72px;border-radius:50%;background:#111;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:#fff;margin:0 auto 10px;
+  overflow:hidden;cursor:pointer;position:relative;
+}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-avatar-edit{
+  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);
+  font-size:11px;color:#fff;text-align:center;padding:3px 0;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:calc(var(--bottom-bar)+12px);left:16px;right:16px;
+  background:#111;color:#fff;padding:12px 16px;border-radius:12px;
+  font-size:13px;font-weight:500;z-index:999;text-align:center;
+  transform:translateY(80px);opacity:0;transition:.3s;pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* MATCH LISTING */
+.match-card{
+  background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:12px;
+  padding:12px 14px;margin-bottom:8px;
+}
+.match-route{font-size:15px;font-weight:700;color:var(--text)}
+.match-meta{font-size:12px;color:var(--secondary);margin:3px 0 6px}
+.match-price{font-size:16px;font-weight:800;color:var(--green)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* STEP INDICATOR */
+.steps{display:flex;gap:0;margin-bottom:16px}
+.step{flex:1;height:4px;border-radius:2px;background:#E4E4E7;margin:0 2px;transition:.3s}
+.step.done{background:#111}
+.step.active{background:#111;opacity:.5}
+
+/* SKELETON */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,#F3F4F6 25%,#E5E7EB 50%,#F3F4F6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+
+/* SAFE AREA */
+@supports(padding-bottom:env(safe-area-inset-bottom)){
+  .bottom-nav{padding-bottom:env(safe-area-inset-bottom)}
+  body{padding-bottom:calc(var(--bottom-bar)+env(safe-area-inset-bottom)+16px)}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">Karvandor <span id="driver-company-name">Haydovchi</span></div>
+  <button class="notif-btn" onclick="showPage('notifs')">
+    🔔<span class="notif-dot" id="notif-dot"></span>
+  </button>
+</div>
+
+<!-- PAGES -->
+<div class="content">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div id="home-content"></div>
+  </div>
+
+  <!-- TRIPS / YUKLAR -->
+  <div class="page" id="page-trips">
+    <div id="trips-content"></div>
+  </div>
+
+  <!-- MASHINA -->
+  <div class="page" id="page-car">
+    <div id="car-content"></div>
+  </div>
+
+  <!-- HUJJATLAR -->
+  <div class="page" id="page-docs">
+    <div id="docs-content"></div>
+  </div>
+
+  <!-- PROFIL -->
+  <div class="page" id="page-profile">
+    <div id="profile-content"></div>
+  </div>
+
+  <!-- BILDIRISHNOMALAR -->
+  <div class="page" id="page-notifs">
+    <div id="notifs-content"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home')" id="nav-home">
+    <span class="nav-icon">🏠</span><span>Asosiy</span><span class="nav-active-dot"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('trips')" id="nav-trips">
+    <span class="nav-icon">📦</span><span>Yuklar</span><span class="nav-active-dot"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('car')" id="nav-car">
+    <span class="nav-icon">🚗</span><span>Mashina</span><span class="nav-active-dot"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('docs')" id="nav-docs">
+    <span class="nav-icon">📄</span><span>Hujjatlar</span><span class="nav-active-dot"></span>
+  </button>
+  <button class="nav-item" onclick="showPage('profile')" id="nav-profile">
+    <span class="nav-icon">👤</span><span>Profil</span><span class="nav-active-dot"></span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<!-- HIDDEN FILE INPUTS -->
+<input type="file" id="fi-photo" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="fi-doc" accept="image/*,application/pdf" capture="environment" style="display:none">
+<input type="file" id="fi-avatar" accept="image/*" style="display:none">
+<input type="file" id="fi-vehicle-photo" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="fi-vehicle-multi" accept="image/*" capture="environment" multiple style="display:none">
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════════════════
+const DB_KEY = 'karvandor_v1';
+const MY_ID  = 'd1'; // Telegram WebApp orqali keladi, hozircha hardcode
+
+const DEFAULT_DB = {
+  company: { name: 'Navoiy Trans LLC', logoDataUrl: '', primaryColor: '#111111' },
+  drivers: [
+    { id:'d1', name:'Azizbek Raximov', phone:'+998901234567', carType:'fura', vehicleId:'v1',
+      rating:4.8, status:'on-trip', avatarDataUrl:'',
+      currentTrip:{ orderId:'o1', from:'Buxoro', to:'Samarqand', startedAt:Date.now()-14400000, estimatedHours:5 },
+      smartMatchAlert:false, smartMatchDismissed:false,
+      docs:{
+        passport:  { dataUrl:'', expiry:'2028-05-12', verified:true  },
+        license:   { dataUrl:'', expiry:'2027-03-01', category:'CE', verified:true  },
+        medCert:   { dataUrl:'', expiry:'2025-12-01', verified:false },
+      }
+    },
+  ],
+  vehicles: [
+    { id:'v1', plateNumber:'01A123AB', type:'fura', driverId:'d1',
+      brand:'MAN', model:'TGX', year:2019, color:'Oq',
+      photos:[], // dataUrl array
+      docs:{
+        techPassport: { dataUrl:'', expiry:'2027-04-01', verified:true  },
+        insurance:    { dataUrl:'', expiry:'2026-08-15', verified:true  },
+        tirPermit:    { dataUrl:'', expiry:'2027-01-01', verified:true  },
+        adrPermit:    { dataUrl:'', expiry:'',           verified:false },
+      }
+    },
+  ],
+  orders:[
+    { id:'o1', from:'Buxoro', to:'Samarqand', cargo:'Qurilish materiallari', weight:18, carType:'fura',
+      status:'on-road', driverId:'d1', price:2800000, createdAt:Date.now()-15000000,
+      customer:{ name:'Rahmat Yusupov', phone:'+998901111111' },
+      contactLog:[], images:[], borderCrossings:[] },
+    { id:'o4', from:'Toshkent', to:'Navoiy', cargo:'Oziq-ovqat', weight:8, carType:'yuk',
+      status:'delivered', driverId:'d1', price:3200000, createdAt:Date.now()-86400000,
+      customer:{ name:'Alisher Yunusov', phone:'+998904444444' },
+      contactLog:[], images:[], borderCrossings:[] },
+  ],
+  freightListings:[
+    { id:'l1', from:'Samarqand', to:'Buxoro', cargo:'Paxta', weight:15, price:2500000,
+      contactPhone:'+998905555555', status:'open', matchedDriverId:null, createdAt:Date.now()-1800000 },
+    { id:'l3', from:'Samarqand', to:'Navoiy', cargo:'Oziq-ovqat', weight:10, price:1800000,
+      contactPhone:'+998907777777', status:'open', matchedDriverId:null, createdAt:Date.now()-600000 },
+  ],
+  smartTimers:[],
+  notifications:[
+    { id:'n1', roles:['driver'], text:'🟡 90% yo\'lni bosib o\'tdingiz — qaytish yuki qidiring!', ts:Date.now()-1200000, read:false },
+    { id:'n2', roles:['driver'], text:'✅ Buyurtma tasdiqlandi: Buxoro → Samarqand', ts:Date.now()-3600000, read:true },
+  ],
+};
+
+function loadDB(){
+  try{ const r=localStorage.getItem(DB_KEY); if(!r) return deepClone(DEFAULT_DB);
+    return deepMerge(deepClone(DEFAULT_DB), JSON.parse(r)); }
+  catch{ return deepClone(DEFAULT_DB); }
+}
+function saveDB(db){
+  try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); }
+  try{ new BroadcastChannel('karvandor').postMessage({type:'db_update'}); }catch{}
+}
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function deepMerge(t,s){
+  if(!s||typeof s!=='object') return t;
+  for(const k of Object.keys(s)){
+    if(Array.isArray(s[k])) t[k]=s[k];
+    else if(s[k]&&typeof s[k]==='object') t[k]=deepMerge(t[k]||{},s[k]);
+    else t[k]=s[k];
+  } return t;
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function fmoney(n){ return new Intl.NumberFormat('uz-UZ').format(n)+" so'm"; }
+function timeAgo(ts){ const d=Date.now()-ts; if(d<60000) return 'Hozir'; if(d<3600000) return Math.floor(d/60000)+' daq'; if(d<86400000) return Math.floor(d/3600000)+' soat'; return new Date(ts).toLocaleDateString('uz-UZ'); }
+function docStatus(exp){ if(!exp) return 'missing'; const d=Math.ceil((new Date(exp)-new Date())/86400000); if(d<0) return 'expired'; if(d<=30) return 'warning'; return 'ok'; }
+function docLabel(exp){ const s=docStatus(exp); const m={ok:'Amal qiladi',warning:'Tez orada tugaydi',expired:'Muddati o\'tgan',missing:'Yuklanmagan'}; return m[s]; }
+function docColor(exp){ return{ok:'#059669',warning:'#D97706',expired:'#DC2626',missing:'#9CA3AF'}[docStatus(exp)]; }
+function docIcon(exp){ return{ok:'✅',warning:'⚠️',expired:'🔴',missing:'⬜'}[docStatus(exp)]; }
+const CAR_TYPES=[{v:'fura',l:'Fura (20t)'},{v:'yuk',l:'Yuk mashinasi'},{v:'termo',l:'Termofurgon'},{v:'tir',l:'TIR'},{v:'van',l:'Van'}];
+function carLabel(t){ return CAR_TYPES.find(c=>c.v===t)?.l||t; }
+function tripProgress(d){ if(!d.currentTrip) return 0; const e=Date.now()-d.currentTrip.startedAt; const total=d.currentTrip.estimatedHours*3600000; return Math.min(100,Math.round(e/total*100)); }
+
+function toast(msg,ms=2500){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+function genId(){ return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+
+// IMAGE COMPRESSION
+function compressImg(file, maxSide=1200, quality=0.70){
+  return new Promise(res=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        const scale=Math.min(1, maxSide/Math.max(img.width,img.height));
+        canvas.width=Math.round(img.width*scale);
+        canvas.height=Math.round(img.height*scale);
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        res(canvas.toDataURL('image/webp', quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+let currentPage = 'home';
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  currentPage=name;
+  const renders={home:renderHome,trips:renderTrips,car:renderCar,docs:renderDocs,profile:renderProfile,notifs:renderNotifs};
+  renders[name]?.();
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════
+function renderHome(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const myOrders=db.orders.filter(o=>o.driverId===MY_ID);
+  const activeOrder=myOrders.find(o=>o.status==='on-road');
+  const pct=me?tripProgress(me):0;
+  const unreadNotifs=db.notifications.filter(n=>n.roles.includes('driver')&&!n.read);
+  document.getElementById('notif-dot').style.display=unreadNotifs.length?'block':'none';
+
+  let html='';
+
+  // Smart Match alert
+  if(me?.smartMatchAlert){
+    const matches=db.freightListings.filter(l=>me.currentTrip&&l.from===me.currentTrip.to&&l.status==='open');
+    html+=`<div class="alert-card alert-yellow">
+      <div class="alert-icon">🟡</div>
+      <div>
+        <div class="alert-title">Qaytish yuki qidiring!</div>
+        <div class="alert-body">Siz ${me.currentTrip?.to} shahriga yaqinlashdingiz. ${matches.length>0?matches.length+' ta mos yuk mavjud.':'Qaytish yo\'nalishida yuk qidiring.'}</div>
+        <div class="btn-row">
+          <button class="btn btn-yellow btn-sm" onclick="showPage('trips')">Yuklar →</button>
+          <button class="btn btn-outline btn-sm" onclick="dismissSmartAlert()">Keyinga</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Status card
+  if(me?.status==='on-trip'&&activeOrder){
+    html+=`<div class="trip-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--secondary);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Joriy qatnov</div>
+          <div class="trip-route">${activeOrder.from} → ${activeOrder.to}</div>
+          <div class="trip-meta">${activeOrder.cargo} • ${activeOrder.weight}t</div>
+        </div>
+        <span class="badge badge-blue">Yo'lda</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${pct>=90?'yellow':''}" id="trip-progress-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-labels">
+        <span>${activeOrder.from}</span>
+        <span style="font-weight:700">${pct}%</span>
+        <span>${activeOrder.to}</span>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#F9FAFB;border-radius:10px">
+        <div style="font-size:12px;color:var(--secondary)">Mijoz: <span style="color:var(--text);font-weight:600">${activeOrder.customer.name}</span></div>
+        <div style="font-size:12px;color:var(--secondary);margin-top:2px">Narx: <span style="color:var(--green);font-weight:700">${fmoney(activeOrder.price)}</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green btn-sm" onclick="markDelivered('${activeOrder.id}')">✅ Yetkazildi</button>
+        <button class="btn btn-outline btn-sm" onclick="addTripPhoto('${activeOrder.id}')">📸 Rasm</button>
+      </div>
+    </div>`;
+  } else if(me?.status==='free'){
+    html+=`<div class="alert-card alert-green">
+      <div class="alert-icon">✅</div>
+      <div>
+        <div class="alert-title">Siz bo'shsiz!</div>
+        <div class="alert-body">Hozir yuk qabul qilishga tayyorsiz. Mavjud yuklar va takliflarni ko'ring.</div>
+        <div class="btn-row"><button class="btn btn-black btn-sm" onclick="showPage('trips')">Yuklar →</button></div>
+      </div>
+    </div>`;
+  }
+
+  // Stats
+  const delivered=myOrders.filter(o=>o.status==='delivered');
+  html+=`<div class="stat-row">
+    <div class="stat-box"><div class="stat-box-val">${myOrders.length}</div><div class="stat-box-label">Jami</div></div>
+    <div class="stat-box"><div class="stat-box-val">${delivered.length}</div><div class="stat-box-label">Bajarildi</div></div>
+    <div class="stat-box"><div class="stat-box-val">⭐${me?.rating||'—'}</div><div class="stat-box-label">Reyting</div></div>
+  </div>`;
+
+  // Doc warnings
+  if(me){
+    const docWarns=[];
+    Object.entries(me.docs||{}).forEach(([k,d])=>{ if(['warning','expired','missing'].includes(docStatus(d?.expiry))) docWarns.push(k); });
+    const v=db.vehicles.find(x=>x.id===me.vehicleId);
+    if(v) Object.entries(v.docs||{}).forEach(([k,d])=>{ if(['expired','warning'].includes(docStatus(d?.expiry))) docWarns.push('transport-'+k); });
+    if(docWarns.length){
+      html+=`<div class="alert-card alert-blue">
+        <div class="alert-icon">📄</div>
+        <div>
+          <div class="alert-title">${docWarns.length} ta hujjat diqqat talab qiladi</div>
+          <div class="alert-body">Hujjatlar muddati yaqinlashmoqda yoki tugagan.</div>
+          <div class="btn-row"><button class="btn btn-black btn-sm" onclick="showPage('docs')">Ko'rish →</button></div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // Recent orders
+  if(delivered.length){
+    html+=`<div class="section-header">So'ngi qatnovlar</div>`;
+    html+=delivered.slice(0,3).map(o=>`
+      <div class="order-item">
+        <div class="order-route">${o.from} → ${o.to}</div>
+        <div class="order-detail">${o.cargo} • ${o.weight}t • ${timeAgo(o.createdAt)}</div>
+        <div class="order-price">${fmoney(o.price)}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('home-content').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════
+// TRIPS PAGE — Mavjud yuklar
+// ═══════════════════════════════════════════════════════
+function renderTrips(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const listings=db.freightListings.filter(l=>l.status==='open');
+  const myHistory=db.orders.filter(o=>o.driverId===MY_ID);
+
+  let html=`<div style="display:flex;gap:6px;margin-bottom:12px" id="trips-tabs">
+    <button class="btn btn-black btn-sm" id="tab-available" onclick="filterTripsTab('available')">Mavjud yuklar (${listings.length})</button>
+    <button class="btn btn-outline btn-sm" id="tab-history" onclick="filterTripsTab('history')">Mening qatnovlarim (${myHistory.length})</button>
+  </div>
+  <div id="trips-available">`;
+
+  if(me?.smartMatchAlert){
+    const matches=listings.filter(l=>me.currentTrip&&l.from===me.currentTrip.to&&l.status==='open');
+    if(matches.length){
+      html+=`<div class="section-header" style="color:var(--yellow)">🟡 Mos qaytish yuklari</div>`;
+      html+=matches.map(l=>renderListingCard(l,true)).join('');
+      html+=`<div class="section-header">Boshqa yuklar</div>`;
+    }
+  }
+
+  html+=listings.filter(l=>!(me?.smartMatchAlert&&me.currentTrip&&l.from===me.currentTrip.to)).map(l=>renderListingCard(l,false)).join('');
+  html+=listings.length?'':'<div style="text-align:center;padding:40px 0;color:var(--secondary)"><div style="font-size:40px">📭</div><div style="font-size:14px;font-weight:600;margin-top:8px">Hozircha yuk yo\'q</div></div>';
+  html+=`</div>
+  <div id="trips-history" style="display:none">
+    ${myHistory.map(o=>`<div class="order-item">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div class="order-route">${o.from} → ${o.to}</div>
+        <span class="badge ${o.status==='delivered'?'badge-green':o.status==='on-road'?'badge-blue':'badge-yellow'}">${o.status==='delivered'?'Yetkazildi':o.status==='on-road'?'Yo\'lda':'Kutilmoqda'}</span>
+      </div>
+      <div class="order-detail">${o.cargo} • ${o.weight}t • ${timeAgo(o.createdAt)}</div>
+      <div class="order-price">${fmoney(o.price)}</div>
+    </div>`).join('')||'<div style="text-align:center;padding:40px 0;color:var(--secondary)"><div style="font-size:14px">Qatnovlar yo\'q</div></div>'}
+  </div>`;
+  document.getElementById('trips-content').innerHTML=html;
+}
+function renderListingCard(l, highlight){
+  return`<div class="${highlight?'match-card':'order-item'}" style="margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div class="${highlight?'match-route':'order-route'}">${l.from} → ${l.to}</div>
+      ${highlight?'<span class="badge badge-yellow">🟡 Mos</span>':''}
+    </div>
+    <div class="${highlight?'match-meta':'order-detail'}">${l.cargo} • ${l.weight}t • ${timeAgo(l.createdAt)}</div>
+    <div class="${highlight?'match-price':'order-price'}">${fmoney(l.price)}</div>
+    <div class="btn-row" style="margin-top:8px">
+      <a href="tel:${l.contactPhone}" class="btn btn-black btn-sm">📞 Qo'ng'iroq</a>
+      ${highlight?`<button class="btn btn-yellow btn-sm" onclick="acceptReturnLoad('${l.id}')">✅ Qabul qilish</button>`:''}
+    </div>
+  </div>`;
+}
+function filterTripsTab(tab){
+  document.getElementById('trips-available').style.display=tab==='available'?'block':'none';
+  document.getElementById('trips-history').style.display=tab==='history'?'block':'none';
+  document.getElementById('tab-available').className='btn btn-sm '+(tab==='available'?'btn-black':'btn-outline');
+  document.getElementById('tab-history').className='btn btn-sm '+(tab==='history'?'btn-black':'btn-outline');
+}
+function acceptReturnLoad(listingId){
+  const db=loadDB();
+  const l=db.freightListings.find(x=>x.id===listingId);
+  if(!l)return;
+  l.status='matched';l.matchedDriverId=MY_ID;
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(me){me.smartMatchAlert=false;me.smartMatchDismissed=true;}
+  const t=db.smartTimers.find(t=>t.driverId===MY_ID);
+  if(t){t.dismissed=true;}
+  saveDB(db);toast('✅ Yuk qabul qilindi! Dispecher bilan bog\'laning.');showPage('home');
+}
+function markDelivered(orderId){
+  const db=loadDB();
+  const o=db.orders.find(x=>x.id===orderId);
+  if(!o)return;
+  o.status='delivered';o.deliveredAt=Date.now();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(me){me.status='free';me.currentTrip=null;me.smartMatchAlert=false;}
+  saveDB(db);toast('✅ Manzilga yetkazildi!');renderHome();
+}
+
+// ═══════════════════════════════════════════════════════
+// CAR PAGE — Mashina ma'lumotlari
+// ═══════════════════════════════════════════════════════
+function renderCar(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const v=db.vehicles.find(x=>x.id===me?.vehicleId);
+  if(!v){
+    document.getElementById('car-content').innerHTML=`<div class="card" style="text-align:center;padding:32px">
+      <div style="font-size:48px;margin-bottom:10px">🚛</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Mashina biriktirilmagan</div>
+      <div style="font-size:13px;color:var(--secondary)">Dispecher sizga transport biriktiradi</div>
+    </div>`; return;
+  }
+
+  const html=`
+    <!-- Mashina rasmlari -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">📸</span>Mashina rasmlari</div>
+      <div class="photo-grid" id="vehicle-photos-grid">
+        ${(v.photos||[]).map((p,i)=>`<div class="photo-thumb" onclick="removeVehiclePhoto(${i})">
+          <img src="${p}" alt="photo">
+          <div class="photo-thumb-del">✕</div>
+        </div>`).join('')}
+        ${(v.photos||[]).length<9?`<div class="photo-thumb photo-thumb-add" onclick="addVehiclePhoto()">➕</div>`:''}
+      </div>
+      <div style="font-size:11px;color:var(--secondary);margin-top:8px">Mashina rasmlari, ichki ko'rinish va yuklangan yuk</div>
+    </div>
+
+    <!-- Ma'lumotlar -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">🚗</span>Mashina ma'lumotlari</div>
+      <div class="form-group">
+        <label class="form-label">Davlat raqami</label>
+        <input class="form-input" id="v-plate" value="${v.plateNumber}" placeholder="01A123AB">
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Brend</label>
+          <input class="form-input" id="v-brand" value="${v.brand||''}" placeholder="MAN, Volvo...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Model</label>
+          <input class="form-input" id="v-model" value="${v.model||''}" placeholder="TGX, FH...">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Yili</label>
+          <input class="form-input" id="v-year" type="number" value="${v.year||''}" placeholder="2019">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rangi</label>
+          <input class="form-input" id="v-color" value="${v.color||''}" placeholder="Oq, Qora...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Transport turi</label>
+        <select class="form-input" id="v-type">
+          ${CAR_TYPES.map(c=>`<option value="${c.v}"${v.type===c.v?' selected':''}>${c.l}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-black" style="margin-top:4px" onclick="saveVehicleInfo()">💾 Saqlash</button>
+    </div>
+
+    <!-- Hujjatlar holati qisqa ko'rinish -->
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">📄</span>Transport hujjatlari <button style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:600" onclick="showPage('docs')">Ko'rish →</button></div>
+      ${[
+        {key:'techPassport',label:'Texnik pasport'},
+        {key:'insurance',label:'Sug\'urta'},
+        {key:'tirPermit',label:'TIR ruxsatnomasi'},
+        {key:'adrPermit',label:'ADR ruxsatnomasi'},
+      ].map(doc=>`<div class="doc-item">
+        <div class="doc-status-icon">${docIcon(v.docs[doc.key]?.expiry)}</div>
+        <div class="doc-info">
+          <div class="doc-name">${doc.label}</div>
+          <div class="doc-expiry" style="color:${docColor(v.docs[doc.key]?.expiry)}">${docLabel(v.docs[doc.key]?.expiry)}${v.docs[doc.key]?.expiry?' • '+v.docs[doc.key].expiry:''}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+
+  document.getElementById('car-content').innerHTML=html;
+}
+function saveVehicleInfo(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const v=db.vehicles.find(x=>x.id===me?.vehicleId);
+  if(!v)return;
+  v.plateNumber=document.getElementById('v-plate').value||v.plateNumber;
+  v.brand=document.getElementById('v-brand').value;
+  v.model=document.getElementById('v-model').value;
+  v.year=parseInt(document.getElementById('v-year').value)||v.year;
+  v.color=document.getElementById('v-color').value;
+  v.type=document.getElementById('v-type').value;
+  if(me) me.carType=v.type;
+  saveDB(db);toast('✅ Ma\'lumotlar saqlandi!');
+}
+function addVehiclePhoto(){
+  document.getElementById('fi-vehicle-multi').click();
+}
+document.getElementById('fi-vehicle-multi').addEventListener('change', async e=>{
+  const files=Array.from(e.target.files);
+  if(!files.length)return;
+  toast('Rasmlar siqilmoqda...',5000);
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const v=db.vehicles.find(x=>x.id===me?.vehicleId);
+  if(!v)return;
+  if(!v.photos)v.photos=[];
+  for(const f of files){
+    if(v.photos.length>=9)break;
+    const url=await compressImg(f,1200,0.70);
+    v.photos.push(url);
+  }
+  saveDB(db);toast('✅ Rasmlar saqlandi!');renderCar();
+  e.target.value='';
+});
+function removeVehiclePhoto(idx){
+  if(!confirm('Bu rasmni o\'chirish?'))return;
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const v=db.vehicles.find(x=>x.id===me?.vehicleId);
+  if(!v)return;
+  v.photos.splice(idx,1);
+  saveDB(db);toast('Rasm o\'chirildi');renderCar();
+}
+function addTripPhoto(orderId){
+  _uploadCtx={target:'order',id:orderId};
+  document.getElementById('fi-photo').click();
+}
+
+// ═══════════════════════════════════════════════════════
+// DOCS PAGE — Hujjatlar
+// ═══════════════════════════════════════════════════════
+function renderDocs(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  const v=db.vehicles.find(x=>x.id===me?.vehicleId);
+
+  const driverDocs=[
+    {key:'passport',   label:'Pasport'},
+    {key:'license',    label:'Haydovchilik guvohnomasi'},
+    {key:'medCert',    label:'Tibbiy sertifikat'},
+  ];
+  const vehicleDocs=[
+    {key:'techPassport',label:'Texnik pasport'},
+    {key:'insurance',   label:"Sug'urta polisi"},
+    {key:'tirPermit',   label:'TIR ruxsatnomasi'},
+    {key:'adrPermit',   label:'ADR ruxsatnomasi'},
+  ];
+
+  const makeDocItem=(docKey,docData,type,ownerId)=>{
+    const status=docStatus(docData?.expiry);
+    const hasFile=!!docData?.dataUrl;
+    return`<div class="doc-item" id="docitem-${type}-${docKey}">
+      <div class="doc-status-icon">${docIcon(docData?.expiry)}</div>
+      <div class="doc-info">
+        <div class="doc-name">${docKey==='passport'?'Pasport':docKey==='license'?'Haydovchilik guvohnomasi':docKey==='medCert'?'Tibbiy sertifikat':docKey==='techPassport'?'Texnik pasport':docKey==='insurance'?"Sug'urta":docKey==='tirPermit'?'TIR ruxsatnomasi':'ADR ruxsatnomasi'}</div>
+        <div class="doc-expiry" style="color:${docColor(docData?.expiry)}">${docLabel(docData?.expiry)}${docData?.expiry?' • '+docData.expiry:''}</div>
+      </div>
+      <button style="padding:7px 12px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:var(--blue);flex-shrink:0" onclick="toggleDocUpload('${type}','${ownerId}','${docKey}')">
+        ${hasFile?'🔄 Yangilash':'📎 Yuklash'}
+      </button>
+    </div>
+    <div class="doc-upload-area" id="docupload-${type}-${docKey}">
+      ${hasFile?`<img src="${docData.dataUrl}" class="doc-upload-preview" style="margin-bottom:8px"><br>`:''}
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">${hasFile?'Yangi':'Hujjat'} rasmini yoling</div>
+      <button class="btn btn-black btn-sm" style="margin:0 auto" onclick="uploadDocFile('${type}','${ownerId}','${docKey}')">📷 Rasm olish / Yuklash</button>
+      <div class="form-row-2" style="margin-top:10px;gap:8px">
+        <div>
+          <div class="form-label">Muddati</div>
+          <input class="form-input" type="date" id="doc-expiry-${type}-${docKey}" value="${docData?.expiry||''}" style="font-size:13px;padding:8px 10px">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-green btn-sm w-full" onclick="saveDocExpiry('${type}','${ownerId}','${docKey}')">Saqlash</button>
+        </div>
+      </div>
+    </div>`;
+  };
+
+  document.getElementById('docs-content').innerHTML=`
+    <div class="card">
+      <div class="card-title"><span>👤</span> Shaxsiy hujjatlar</div>
+      ${driverDocs.map(d=>makeDocItem(d.key,me?.docs?.[d.key],'driver',MY_ID)).join('')}
+    </div>
+    ${v?`<div class="card">
+      <div class="card-title"><span>🚛</span> Transport hujjatlari</div>
+      ${vehicleDocs.map(d=>makeDocItem(d.key,v.docs?.[d.key],'vehicle',v.id)).join('')}
+    </div>`:''}`;
+}
+
+function toggleDocUpload(type,ownerId,docKey){
+  const area=document.getElementById(`docupload-${type}-${docKey}`);
+  area.classList.toggle('open');
+}
+function uploadDocFile(type,ownerId,docKey){
+  _uploadCtx={target:'doc',type,ownerId,docKey};
+  document.getElementById('fi-doc').click();
+}
+function saveDocExpiry(type,ownerId,docKey){
+  const val=document.getElementById(`doc-expiry-${type}-${docKey}`)?.value;
+  if(!val){toast('Muddatni kiriting');return;}
+  const db=loadDB();
+  if(type==='driver'){
+    const d=db.drivers.find(x=>x.id===ownerId);
+    if(d&&d.docs[docKey])d.docs[docKey].expiry=val;
+  } else {
+    const v=db.vehicles.find(x=>x.id===ownerId);
+    if(v&&v.docs[docKey])v.docs[docKey].expiry=val;
+  }
+  saveDB(db);toast('✅ Muddat saqlandi!');
+  document.getElementById(`docupload-${type}-${docKey}`).classList.remove('open');
+  renderDocs();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROFILE PAGE
+// ═══════════════════════════════════════════════════════
+function renderProfile(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(!me)return;
+
+  document.getElementById('profile-content').innerHTML=`
+    <div class="card" style="text-align:center;padding:24px">
+      <div class="profile-avatar" id="profile-avatar-wrap" onclick="document.getElementById('fi-avatar').click()">
+        ${me.avatarDataUrl?`<img src="${me.avatarDataUrl}" alt="avatar">`:`<span>${me.name[0]}</span>`}
+        <div class="profile-avatar-edit">✏️ Tahrir</div>
+      </div>
+      <div style="font-size:18px;font-weight:800">${me.name}</div>
+      <div style="color:var(--secondary);font-size:13px;margin-top:3px">${carLabel(me.carType)}</div>
+      <div style="margin-top:8px">
+        <span class="badge ${me.status==='free'?'badge-green':'badge-blue'}">${me.status==='free'?"Bo'sh":'Yo\'lda'}</span>
+        <span class="badge badge-yellow" style="margin-left:4px">⭐ ${me.rating}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ma'lumotlarni tahrirlash</div>
+      <div class="form-group">
+        <label class="form-label">To'liq ismi</label>
+        <input class="form-input" id="p-name" value="${me.name}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefon</label>
+        <input class="form-input" id="p-phone" value="${me.phone}" type="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Transport turi</label>
+        <select class="form-input" id="p-cartype">
+          ${CAR_TYPES.map(c=>`<option value="${c.v}"${me.carType===c.v?' selected':''}>${c.l}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-black" onclick="saveProfile()">💾 Saqlash</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Statistika</div>
+      ${[
+        ['📦','Jami qatnovlar',db.orders.filter(o=>o.driverId===MY_ID).length],
+        ['✅','Bajarilganlar',db.orders.filter(o=>o.driverId===MY_ID&&o.status==='delivered').length],
+        ['⭐','Reyting',me.rating+'/5'],
+        ['💰','Jami daromad',fmoney(db.orders.filter(o=>o.driverId===MY_ID&&o.status==='delivered').reduce((s,o)=>s+o.price,0))],
+      ].map(([icon,label,val])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F3F4F6">
+        <span style="font-size:13px;color:var(--secondary)">${icon} ${label}</span>
+        <span style="font-size:13px;font-weight:700">${val}</span>
+      </div>`).join('')}
+    </div>`;
+}
+function saveProfile(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(!me)return;
+  me.name=document.getElementById('p-name').value||me.name;
+  me.phone=document.getElementById('p-phone').value||me.phone;
+  me.carType=document.getElementById('p-cartype').value;
+  saveDB(db);toast('✅ Profil yangilandi!');renderProfile();
+}
+
+// AVATAR UPLOAD
+document.getElementById('fi-avatar').addEventListener('change', async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const url=await compressImg(f,300,0.80);
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(me)me.avatarDataUrl=url;
+  saveDB(db);toast('Avatar yangilandi!');renderProfile();
+  e.target.value='';
+});
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICATIONS PAGE
+// ═══════════════════════════════════════════════════════
+function renderNotifs(){
+  const db=loadDB();
+  db.notifications.filter(n=>n.roles.includes('driver')).forEach(n=>n.read=true);
+  saveDB(db);
+  document.getElementById('notif-dot').style.display='none';
+  const notifs=db.notifications.filter(n=>n.roles.includes('driver'));
+  document.getElementById('notifs-content').innerHTML=notifs.length?`
+    <div class="card">
+      ${notifs.map(n=>`<div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #F3F4F6">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:5px;flex-shrink:0"></div>
+        <div>
+          <div style="font-size:13px;color:var(--text)">${n.text}</div>
+          <div style="font-size:11px;color:var(--secondary);margin-top:2px">${timeAgo(n.ts)}</div>
+        </div>
+      </div>`).join('')}
+    </div>`:`<div style="text-align:center;padding:48px 0;color:var(--secondary)">
+      <div style="font-size:40px">🔔</div>
+      <div style="font-size:14px;font-weight:600;margin-top:8px">Bildirishnomalar yo'q</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// FILE UPLOAD HANDLER
+// ═══════════════════════════════════════════════════════
+let _uploadCtx = {};
+
+document.getElementById('fi-doc').addEventListener('change', async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  toast('Hujjat siqilmoqda...',4000);
+  const url=await compressImg(f,1400,0.75);
+  const db=loadDB();
+  const ctx=_uploadCtx;
+  if(ctx.target==='doc'){
+    if(ctx.type==='driver'){
+      const d=db.drivers.find(x=>x.id===ctx.ownerId);
+      if(d&&d.docs[ctx.docKey])d.docs[ctx.docKey].dataUrl=url;
+    } else if(ctx.type==='vehicle'){
+      const v=db.vehicles.find(x=>x.id===ctx.ownerId);
+      if(v&&v.docs[ctx.docKey])v.docs[ctx.docKey].dataUrl=url;
+    }
+  }
+  saveDB(db);toast('✅ Hujjat yuklandi!');renderDocs();
+  e.target.value='';
+});
+
+document.getElementById('fi-photo').addEventListener('change', async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const url=await compressImg(f,1200,0.70);
+  const db=loadDB();
+  const o=db.orders.find(x=>x.id===_uploadCtx.id);
+  if(o){if(!o.images)o.images=[];o.images.push(url);}
+  saveDB(db);toast('📸 Rasm saqlandi!');
+  e.target.value='';
+});
+
+// ═══════════════════════════════════════════════════════
+// SMART ALERT
+// ═══════════════════════════════════════════════════════
+function dismissSmartAlert(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(!me)return;
+  me.smartMatchAlert=false;me.smartMatchDismissed=true;
+  const t=db.smartTimers.find(t=>t.driverId===MY_ID);
+  if(t)t.dismissed=true;
+  saveDB(db);renderHome();
+}
+function initSmartTimers(){
+  const db=loadDB();
+  db.smartTimers.forEach(t=>{
+    if(t.driverId!==MY_ID||t.alertFired||t.dismissed)return;
+    const remaining=t.alertAfter-(Date.now()-t.startedAt);
+    if(remaining<=0) fireMySmartAlert();
+    else setTimeout(fireMySmartAlert, remaining);
+  });
+}
+function fireMySmartAlert(){
+  const db=loadDB();
+  const me=db.drivers.find(d=>d.id===MY_ID);
+  if(!me||me.smartMatchDismissed)return;
+  me.smartMatchAlert=true;
+  const t=db.smartTimers.find(x=>x.driverId===MY_ID);
+  if(t)t.alertFired=true;
+  saveDB(db);
+  if(currentPage==='home')renderHome();
+  toast('🟡 Qaytish yuki qidiring!',3000);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+(function init(){
+  const db=loadDB();
+  const comp=db.company;
+  if(comp?.name) document.getElementById('driver-company-name').textContent=comp.name;
+  renderHome();
+  initSmartTimers();
+  try{
+    const bc=new BroadcastChannel('karvandor');
+    bc.addEventListener('message',()=>{ if(currentPage==='home')renderHome(); });
+  }catch{}
+})();
+</script>
+</body>
+</html>
