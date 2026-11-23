@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Karvandor — Yuk beruvchi</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F4F5F7;
+  --card:#ffffff;
+  --border:#E4E4E7;
+  --text:#111111;
+  --secondary:#6B7280;
+  --green:#059669;
+  --yellow:#F59E0B;
+  --red:#DC2626;
+  --blue:#2563EB;
+  --radius:16px;
+  --bottom:64px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--bottom)+16px)}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar-brand{display:flex;align-items:center;gap:8px}
+.topbar-logo{width:30px;height:30px;border-radius:8px;background:#111;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;overflow:hidden;flex-shrink:0}
+.topbar-logo img{width:100%;height:100%;object-fit:cover}
+.topbar-name{font-size:15px;font-weight:700}
+.topbar-name span{font-weight:400;color:var(--secondary);font-size:13px}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;position:relative}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff;display:none}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;height:var(--bottom);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--secondary);font-size:11px;font-weight:500}
+.nav-btn.active{color:var(--text)}
+.nav-icon{font-size:21px;line-height:1}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--text);display:none}
+.nav-btn.active .nav-dot{display:block}
+@supports(padding-bottom:env(safe-area-inset-bottom)){.bottom-nav{padding-bottom:env(safe-area-inset-bottom)}body{padding-bottom:calc(var(--bottom)+env(safe-area-inset-bottom)+16px)}}
+
+/* PAGES */
+.page{display:none;padding:16px}
+.page.active{display:block}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.bg-green{background:#D1FAE5;color:#059669}
+.bg-yellow{background:#FEF3C7;color:#D97706}
+.bg-red{background:#FEE2E2;color:#DC2626}
+.bg-blue{background:#DBEAFE;color:#2563EB}
+.bg-gray{background:#F3F4F6;color:#6B7280}
+
+/* FORM */
+.form-group{margin-bottom:13px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--secondary);margin-bottom:5px}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;color:var(--text);outline:none;background:#fff;-webkit-appearance:none}
+.form-input:focus{border-color:#111}
+select.form-input{cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-hint{font-size:11px;color:var(--secondary);margin-top:4px}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;width:100%;transition:.15s}
+.btn:active{opacity:.85}
+.btn-black{background:#111;color:#fff}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn-green{background:#059669;color:#fff}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:9px;width:auto;display:inline-flex}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* ORDER CARD */
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;position:relative}
+.order-card:active{background:#F9FAFB}
+.order-route{font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px}
+.order-meta{font-size:12px;color:var(--secondary);margin-bottom:8px}
+.order-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.order-price{font-size:16px;font-weight:800;color:var(--green)}
+
+/* PROGRESS STEPS */
+.steps-row{display:flex;align-items:center;margin:10px 0}
+.step-item{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.step-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--secondary);z-index:1}
+.step-circle.done{background:#111;border-color:#111;color:#fff}
+.step-circle.active{border-color:#111;color:#111}
+.step-line{position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.step-line.done{background:#111}
+.step-label{font-size:10px;color:var(--secondary);margin-top:4px;text-align:center;max-width:60px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.stat-val{font-size:22px;font-weight:800}
+.stat-label{font-size:11px;color:var(--secondary);margin-top:2px}
+
+/* ALERT */
+.alert{border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start}
+.alert-green{background:#ECFDF5;border:1.5px solid #059669}
+.alert-blue{background:#EFF6FF;border:1.5px solid #2563EB}
+.alert-yellow{background:#FFFBEB;border:1.5px solid #F59E0B}
+.alert-icon{font-size:22px;flex-shrink:0}
+.alert-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.alert-body{font-size:12px;color:var(--secondary);line-height:1.5}
+
+/* COMPANY LOGO UPLOAD */
+.logo-upload{border:2px dashed var(--border);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:.15s}
+.logo-upload:active{border-color:#111;background:#F9FAFB}
+.logo-preview{width:72px;height:72px;border-radius:14px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;overflow:hidden;font-size:28px}
+.logo-preview img{width:100%;height:100%;object-fit:cover}
+.logo-upload-label{font-size:13px;font-weight:600;color:var(--text)}
+.logo-upload-hint{font-size:11px;color:var(--secondary);margin-top:3px}
+
+/* SECTION HEADER */
+.section-hdr{font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px}
+
+/* TRACK TIMELINE */
+.timeline{padding:4px 0}
+.tl-item{display:flex;gap:12px;position:relative;padding-bottom:16px}
+.tl-item:last-child{padding-bottom:0}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:20px;flex-shrink:0}
+.tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;z-index:1}
+.tl-dot.done{background:#111;border-color:#111}
+.tl-dot.active{border-color:#111;background:#EFF6FF;animation:pulse-tl .9s ease-in-out infinite}
+@keyframes pulse-tl{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.3)}50%{box-shadow:0 0 0 5px rgba(37,99,235,.1)}}
+.tl-line{flex:1;width:2px;background:var(--border);margin-top:2px}
+.tl-line.done{background:#111}
+.tl-content{flex:1;padding-top:0}
+.tl-title{font-size:13px;font-weight:600;color:var(--text)}
+.tl-sub{font-size:11px;color:var(--secondary);margin-top:2px}
+
+/* PRICE CALC BOX */
+.price-box{background:#F9FAFB;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.price-row-label{font-size:12px;color:var(--secondary)}
+.price-row-val{font-size:13px;font-weight:700;color:var(--text)}
+.price-total{font-size:18px;font-weight:800;color:var(--green)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .25s}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:#E4E4E7;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:16px}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--bottom)+12px);left:16px;right:16px;background:#111;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:500;z-index:999;text-align:center;transform:translateY(80px);opacity:0;transition:.3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:#F3F4F6;border-radius:10px;padding:3px;margin-bottom:14px}
+.tab{flex:1;padding:7px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--secondary);border:none;background:transparent;transition:.15s;text-align:center}
+.tab.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* RATING STARS */
+.stars-row{display:flex;gap:6px;margin:8px 0}
+.star{font-size:28px;cursor:pointer;color:#E4E4E7;transition:.1s}
+.star.on{color:#F59E0B}
+
+/* DRIVER INFO CARD */
+.driver-info-card{display:flex;align-items:center;gap:12px;padding:12px;background:#F9FAFB;border-radius:12px;margin-top:8px}
+.driver-ava{width:40px;height:40px;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0}
+.driver-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 0;color:var(--secondary)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.empty-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty-sub{font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo" id="tb-logo"><span id="tb-logo-letter">K</span></div>
+    <div class="topbar-name" id="tb-name">Karvandor <span>· Yuk beruvchi</span></div>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="showPage('notifs')">🔔<span class="notif-dot" id="notif-dot"></span></button>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div id="pages">
+  <div class="page active" id="page-home"><div id="home-body"></div></div>
+  <div class="page" id="page-new"><div id="new-body"></div></div>
+  <div class="page" id="page-orders"><div id="orders-body"></div></div>
+  <div class="page" id="page-company"><div id="company-body"></div></div>
+  <div class="page" id="page-notifs"><div id="notifs-body"></div></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('home')" id="nav-home"><span class="nav-icon">🏠</span><span>Asosiy</span><span class="nav-dot"></span></button>
+  <button class="nav-btn" onclick="showPage('new')" id="nav-new"><span class="nav-icon">➕</span><span>Yuk joylash</span><span class="nav-dot"></span></button>
+  <button class="nav-btn" onclick="showPage('orders')" id="nav-orders"><span class="nav-icon">📦</span><span>Buyurtmalar</span><span class="nav-dot"></span></button>
+  <button class="nav-btn" onclick="showPage('company')" id="nav-company"><span class="nav-icon">🏢</span><span>Kompaniya</span><span class="nav-dot"></span></button>
+</nav>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="order-modal-body"></div>
+  </div>
+</div>
+
+<!-- RATE DRIVER MODAL -->
+<div class="modal-overlay" id="rate-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Haydovchini baholang</div>
+    <div id="rate-modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="fi-logo" accept="image/*" style="display:none">
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════════════════
+const DB_KEY   = 'karvandor_v1';
+const MY_CID   = 'cust_001'; // Telegram WebApp da dinamik keladi
+
+const DEFAULT_DB = {
+  company:{ name:'Navoiy Trans LLC', logoDataUrl:'', primaryColor:'#111' },
+  drivers:[
+    {id:'d1',name:'Azizbek Raximov',phone:'+998901234567',carType:'fura',vehicleId:'v1',rating:4.8,status:'on-trip',
+     currentTrip:{orderId:'o1',from:'Buxoro',to:'Samarqand',startedAt:Date.now()-14400000,estimatedHours:5},
+     smartMatchAlert:false,smartMatchDismissed:false,avatarDataUrl:'',
+     docs:{passport:{dataUrl:'',expiry:'2028-05-12',verified:true},license:{dataUrl:'',expiry:'2027-03-01',category:'CE',verified:true},medCert:{dataUrl:'',expiry:'2025-12-01',verified:false}}},
+  ],
+  vehicles:[{id:'v1',plateNumber:'01A123AB',type:'fura',driverId:'d1',docs:{techPassport:{dataUrl:'',expiry:'2027-04-01',verified:true},insurance:{dataUrl:'',expiry:'2026-08-15',verified:true},tirPermit:{dataUrl:'',expiry:'2027-01-01',verified:true},adrPermit:{dataUrl:'',expiry:'',verified:false}}}],
+  orders:[
+    {id:'o1',from:'Buxoro',to:'Samarqand',cargo:'Qurilish materiallari',weight:18,carType:'fura',status:'on-road',
+     driverId:'d1',price:2800000,createdAt:Date.now()-15000000,deliveredAt:null,
+     customer:{name:'Rahmat Yusupov',phone:'+998901111111',companyId:'cust_001'},
+     contactLog:[],images:[],borderCrossings:[],rated:false},
+    {id:'o2',from:'Navoiy',to:'Toshkent',cargo:'Meva-sabzavot',weight:12,carType:'termo',status:'pending',
+     driverId:null,price:4100000,createdAt:Date.now()-3600000,deliveredAt:null,
+     customer:{name:'Kamola Nazarova',phone:'+998902222222',companyId:'cust_001'},
+     contactLog:[],images:[],borderCrossings:[],rated:false},
+    {id:'o3',from:'Toshkent',to:'Navoiy',cargo:'Oziq-ovqat',weight:8,carType:'yuk',status:'delivered',
+     driverId:'d1',price:3200000,createdAt:Date.now()-86400000,deliveredAt:Date.now()-3600000,
+     customer:{name:'Kamola Nazarova',phone:'+998902222222',companyId:'cust_001'},
+     contactLog:[],images:[],borderCrossings:[],rated:false},
+  ],
+  freightListings:[
+    {id:'l1',from:'Samarqand',to:'Buxoro',cargo:'Paxta',weight:15,price:2500000,contactPhone:'+998905555555',status:'open',matchedDriverId:null,createdAt:Date.now()-1800000,customerCompanyId:'cust_001'},
+    {id:'l2',from:'Toshkent',to:'Navoiy',cargo:'Jihozlar',weight:8,price:3200000,contactPhone:'+998906666666',status:'open',matchedDriverId:null,createdAt:Date.now()-900000,customerCompanyId:'cust_001'},
+  ],
+  customerCompany:{
+    id:'cust_001',name:'',logoDataUrl:'',phone:'',address:'',bin:'',contactPerson:'',
+    plan:'free',
+  },
+  smartTimers:[],
+  notifications:[
+    {id:'n1',roles:['cargo'],text:'✅ Buyurtmangiz haydovchiga biriktirildi',ts:Date.now()-3600000,read:false},
+    {id:'n2',roles:['cargo'],text:'📦 Buyurtma yo\'lda: Buxoro → Samarqand',ts:Date.now()-14400000,read:true},
+  ],
+};
+
+function loadDB(){ try{ const r=localStorage.getItem(DB_KEY); if(!r) return deepClone(DEFAULT_DB); return deepMerge(deepClone(DEFAULT_DB),JSON.parse(r)); }catch{ return deepClone(DEFAULT_DB); } }
+function saveDB(db){ try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch(e){console.warn(e);} try{new BroadcastChannel('karvandor').postMessage({type:'db_update'});}catch{} }
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function deepMerge(t,s){ if(!s||typeof s!=='object') return t; for(const k of Object.keys(s)){ if(Array.isArray(s[k])) t[k]=s[k]; else if(s[k]&&typeof s[k]==='object') t[k]=deepMerge(t[k]||{},s[k]); else t[k]=s[k]; } return t; }
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+const CITIES=['Toshkent','Samarqand','Buxoro','Navoiy','Namangan','Andijan','Farg\'ona','Termiz','Urganch','Nukus','Qarshi','Jizzax'];
+const DISTANCES={'Navoiy-Toshkent':460,'Navoiy-Buxoro':130,'Navoiy-Samarqand':230,'Toshkent-Samarqand':350,'Toshkent-Buxoro':580,'Samarqand-Buxoro':250,'Buxoro-Termiz':420,'Toshkent-Namangan':320,'Toshkent-Andijan':370,'Navoiy-Termiz':540,'Samarqand-Termiz':310,'Toshkent-Urganch':1000,'Toshkent-Qarshi':490,'Samarqand-Qarshi':230,'Navoiy-Qarshi':310};
+const CAR_RATE={fura:1200,yuk:800,termo:1500,tir:2000,van:600};
+const CAR_TYPES=[{v:'fura',l:'Fura (20t)'},{v:'yuk',l:'Yuk mashinasi'},{v:'termo',l:'Termofurgon'},{v:'tir',l:'TIR'},{v:'van',l:'Van'}];
+function carLabel(t){ return CAR_TYPES.find(c=>c.v===t)?.l||t; }
+function fmoney(n){ return new Intl.NumberFormat('uz-UZ').format(n)+" so'm"; }
+function timeAgo(ts){ const d=Date.now()-ts; if(d<60000) return'Hozir'; if(d<3600000) return Math.floor(d/60000)+' daq oldin'; if(d<86400000) return Math.floor(d/3600000)+' soat oldin'; return new Date(ts).toLocaleDateString('uz-UZ'); }
+function calcPrice(from,to,w,ct){ const dist=DISTANCES[`${from}-${to}`]||DISTANCES[`${to}-${from}`]||400; return Math.round(dist*(CAR_RATE[ct]||1000)*Math.max(1,w/10)); }
+function calcHours(from,to){ const dist=DISTANCES[`${from}-${to}`]||DISTANCES[`${to}-${from}`]||400; return Math.round(dist/80*10)/10; }
+function tripProgress(d){ if(!d.currentTrip) return 0; const e=Date.now()-d.currentTrip.startedAt; return Math.min(100,Math.round(e/(d.currentTrip.estimatedHours*3600000)*100)); }
+function statusLabel(s){ return{pending:'Kutilmoqda',on-road:'Yo\'lda',delivered:'Yetkazildi',cancelled:'Bekor'}[s]||s; }
+function statusCls(s){ return{pending:'bg-yellow','on-road':'bg-blue',delivered:'bg-green',cancelled:'bg-red'}[s]||'bg-gray'; }
+function toast(msg,ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),ms); }
+function genId(){ return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+function compressImg(file,maxSide=800,q=0.72){ return new Promise(res=>{ const r=new FileReader(); r.onload=e=>{ const img=new Image(); img.onload=()=>{ const c=document.createElement('canvas'); const sc=Math.min(1,maxSide/Math.max(img.width,img.height)); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc); c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/webp',q)); }; img.src=e.target.result; }; r.readAsDataURL(file); }); }
+
+// ═══════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════
+let CUR='home';
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  CUR=name;
+  ({home:renderHome,new:renderNew,orders:renderOrders,company:renderCompany,notifs:renderNotifs})[name]?.();
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ═══════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════
+function renderHome(){
+  const db=loadDB();
+  const myOrders=db.orders.filter(o=>o.customer?.companyId===MY_CID||true); // demo: all
+  const active=myOrders.filter(o=>o.status==='on-road');
+  const pending=myOrders.filter(o=>o.status==='pending');
+  const done=myOrders.filter(o=>o.status==='delivered');
+  const unread=db.notifications.filter(n=>n.roles.includes('cargo')&&!n.read);
+  document.getElementById('notif-dot').style.display=unread.length?'block':'none';
+  const cc=db.customerCompany;
+  // Update topbar
+  if(cc?.name){ document.getElementById('tb-name').innerHTML=`${cc.name} <span>· Yuk beruvchi</span>`; document.getElementById('tb-logo-letter').textContent=cc.name[0]; }
+  if(cc?.logoDataUrl){ document.getElementById('tb-logo').innerHTML=`<img src="${cc.logoDataUrl}" alt="logo">`; }
+
+  let html='';
+
+  // Active orders
+  if(active.length){
+    html+=`<div class="section-hdr">🚛 Yo'ldagi yuklarim</div>`;
+    active.forEach(o=>{
+      const driver=db.drivers.find(d=>d.id===o.driverId);
+      const pct=driver?tripProgress(driver):0;
+      html+=`<div class="order-card" onclick="openOrderDetail('${o.id}')">
+        <div class="order-route">${o.from} → ${o.to}</div>
+        <div class="order-meta">${o.cargo} • ${o.weight}t • ${carLabel(o.carType)}</div>
+        <div style="height:6px;background:#F3F4F6;border-radius:3px;overflow:hidden;margin:8px 0">
+          <div style="height:100%;width:${pct}%;background:var(--blue);border-radius:3px;transition:.5s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--secondary);margin-bottom:8px">
+          <span>${o.from}</span><span style="font-weight:700">${pct}% bajarildi</span><span>${o.to}</span>
+        </div>
+        ${driver?`<div class="driver-info-card">
+          <div class="driver-ava">${driver.avatarDataUrl?`<img src="${driver.avatarDataUrl}">`:`<span>${driver.name[0]}</span>`}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600">${driver.name}</div>
+            <div style="font-size:11px;color:var(--secondary)">⭐${driver.rating} • ${driver.phone}</div>
+          </div>
+          <a href="tel:${driver.phone}" style="margin-left:auto;padding:7px 12px;border-radius:9px;background:#111;color:#fff;font-size:12px;font-weight:600;text-decoration:none">📞</a>
+        </div>`:''}
+        <div class="order-footer">
+          <span class="badge ${statusCls(o.status)}">${statusLabel(o.status)}</span>
+          <span class="order-price">${fmoney(o.price)}</span>
+        </div>
+      </div>`;
+    });
+  }
+
+  // Pending
+  if(pending.length){
+    html+=`<div class="section-hdr">⏳ Haydovchi kutilmoqda</div>`;
+    pending.forEach(o=>{ html+=`<div class="order-card" onclick="openOrderDetail('${o.id}')">
+      <div class="order-route">${o.from} → ${o.to}</div>
+      <div class="order-meta">${o.cargo} • ${o.weight}t</div>
+      <div class="order-footer"><span class="badge bg-yellow">Kutilmoqda</span><span class="order-price">${fmoney(o.price)}</span></div>
+    </div>`; });
+  }
+
+  // Stats
+  html+=`<div class="section-hdr">📊 Statistika</div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-val">${myOrders.length}</div><div class="stat-label">Jami buyurtmalar</div></div>
+    <div class="stat-box"><div class="stat-val">${done.length}</div><div class="stat-label">Yetkazildi</div></div>
+    <div class="stat-box"><div class="stat-val">${active.length}</div><div class="stat-label">Yo'lda</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${fmoney(done.reduce((s,o)=>s+o.price,0)).replace(" so'm","")}</div><div class="stat-label">Jami summa</div></div>
+  </div>`;
+
+  // Promo: platform invite
+  if(!cc?.name){
+    html+=`<div class="alert alert-blue">
+      <div class="alert-icon">💡</div>
+      <div>
+        <div class="alert-title">Kompaniyangizni sozlang</div>
+        <div class="alert-body">Kompaniya nomini, logosini va ma'lumotlarini to'ldiring. Hamkorlar sizni platforma orqali topsin.</div>
+        <div class="btn-row"><button class="btn btn-black btn-sm" onclick="showPage('company')">Sozlash →</button></div>
+      </div>
+    </div>`;
+  }
+
+  // Done orders needing rating
+  const unrated=done.filter(o=>!o.rated);
+  if(unrated.length){
+    html+=`<div class="alert alert-yellow">
+      <div class="alert-icon">⭐</div>
+      <div>
+        <div class="alert-title">${unrated.length} ta yetkazilgan yuk baholanmagan</div>
+        <div class="alert-body">Haydovchilarni baholang — bu ularga yordam beradi.</div>
+        <div class="btn-row"><button class="btn btn-yellow btn-sm" onclick="rateDriver('${unrated[0].id}')">Baholash</button></div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('home-body').innerHTML=html||`<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Hali buyurtma yo'q</div><div class="empty-sub">Birinchi yukingizni joylashtiring</div><div style="margin-top:16px"><button class="btn btn-black btn-sm" style="margin:0 auto" onclick="showPage('new')">➕ Yuk joylash</button></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ORDER DETAIL MODAL
+// ═══════════════════════════════════════════════════════
+function openOrderDetail(orderId){
+  const db=loadDB();
+  const o=db.orders.find(x=>x.id===orderId);
+  if(!o) return;
+  const driver=db.drivers.find(d=>d.id===o.driverId);
+  const steps=[
+    {label:'Qabul qilindi', done:true},
+    {label:'Haydovchi tayinlandi', done:!!o.driverId},
+    {label:'Yuk olindi', done:['on-road','delivered'].includes(o.status)},
+    {label:'Yetkazildi', done:o.status==='delivered'},
+  ];
+
+  document.getElementById('order-modal-body').innerHTML=`
+    <div class="modal-title">${o.from} → ${o.to}</div>
+    <!-- Progress steps -->
+    <div class="steps-row" style="margin-bottom:16px">
+      ${steps.map((s,i)=>`<div class="step-item">
+        ${i<steps.length-1?`<div class="step-line ${steps[i+1].done?'done':''}"></div>`:''}
+        <div class="step-circle ${s.done?'done':''}">${s.done?'✓':i+1}</div>
+        <div class="step-label">${s.label}</div>
+      </div>`).join('')}
+    </div>
+    <!-- Details -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[['Yuk',o.cargo],['Og\'irlik',o.weight+'t'],['Transport',carLabel(o.carType)],['Narx',fmoney(o.price)]].map(([l,v])=>`<div style="background:#F9FAFB;border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--secondary)">${l}</div><div style="font-size:13px;font-weight:700;margin-top:2px">${v}</div></div>`).join('')}
+    </div>
+    ${driver?`<div class="driver-info-card">
+      <div class="driver-ava">${driver.avatarDataUrl?`<img src="${driver.avatarDataUrl}">`:`<span>${driver.name[0]}</span>`}</div>
+      <div><div style="font-size:13px;font-weight:600">${driver.name}</div>
+      <div style="font-size:11px;color:var(--secondary)">⭐${driver.rating} • ${driver.phone}</div></div>
+      <a href="tel:${driver.phone}" style="margin-left:auto;padding:7px 12px;border-radius:9px;background:#111;color:#fff;font-size:12px;font-weight:600;text-decoration:none">📞</a>
+    </div>`:'<div style="padding:10px;background:#FEF3C7;border-radius:10px;font-size:13px;text-align:center">⏳ Haydovchi tayinlanmoqda...</div>'}
+    <div class="btn-row" style="margin-top:14px">
+      ${o.status==='delivered'&&!o.rated?`<button class="btn btn-black" onclick="closeModal('order-modal');rateDriver('${o.id}')">⭐ Baholash</button>`:''}
+      <button class="btn btn-outline" onclick="closeModal('order-modal')">Yopish</button>
+    </div>`;
+  openModal('order-modal');
+}
+
+// ═══════════════════════════════════════════════════════
+// RATE DRIVER
+// ═══════════════════════════════════════════════════════
+let _rateOrderId='';
+function rateDriver(orderId){
+  _rateOrderId=orderId;
+  const db=loadDB();
+  const o=db.orders.find(x=>x.id===orderId);
+  const driver=db.drivers.find(d=>d.id===o?.driverId);
+  document.getElementById('rate-modal-body').innerHTML=`
+    ${driver?`<div class="driver-info-card" style="margin-bottom:14px">
+      <div class="driver-ava">${driver.name[0]}</div>
+      <div><div style="font-size:14px;font-weight:700">${driver.name}</div>
+      <div style="font-size:12px;color:var(--secondary)">${o.from} → ${o.to} qatnovidan</div></div>
+    </div>`:''}
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:13px;color:var(--secondary);margin-bottom:8px">Yulduz bering:</div>
+      <div class="stars-row" id="stars-row" style="justify-content:center">
+        ${[1,2,3,4,5].map(i=>`<span class="star" data-v="${i}" onclick="setStar(${i})">★</span>`).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Izoh (ixtiyoriy)</label>
+      <textarea class="form-input" id="rate-comment" rows="3" placeholder="Xizmat haqida fikringiz..." style="resize:none;min-height:80px"></textarea>
+    </div>
+    <button class="btn btn-black" onclick="submitRating()">✅ Baholashni yuborish</button>`;
+  openModal('rate-modal');
+  _selectedStar=0;
+}
+let _selectedStar=0;
+function setStar(v){
+  _selectedStar=v;
+  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=v));
+}
+function submitRating(){
+  if(!_selectedStar){toast('Yulduz bering!');return;}
+  const db=loadDB();
+  const o=db.orders.find(x=>x.id===_rateOrderId);
+  if(o){o.rated=true;o.rating=_selectedStar;}
+  const driver=db.drivers.find(d=>d.id===o?.driverId);
+  if(driver){
+    // Simple rolling average
+    driver.rating=Math.round((driver.rating*10+_selectedStar)/11*10)/10;
+  }
+  saveDB(db);
+  closeModal('rate-modal');
+  toast('⭐ Rahmat! Baholash yuborildi.');
+  if(CUR==='home')renderHome();
+}
+
+// ═══════════════════════════════════════════════════════
+// NEW LISTING
+// ═══════════════════════════════════════════════════════
+function renderNew(){
+  const cityOpts=CITIES.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('new-body').innerHTML=`
+    <div class="card">
+      <div class="card-title">📦 Yuk ma'lumotlari</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Qayerdan</label>
+          <select class="form-input" id="n-from" onchange="calcNewPrice()">${cityOpts}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Qayerga</label>
+          <select class="form-input" id="n-to" onchange="calcNewPrice()">${cityOpts}</select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Yuk nomi</label>
+        <input class="form-input" id="n-cargo" placeholder="Paxta, elektronika, oziq-ovqat...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Og'irlik (tonna)</label>
+          <input class="form-input" type="number" id="n-weight" value="10" min="0.5" step="0.5" onchange="calcNewPrice()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Transport turi</label>
+          <select class="form-input" id="n-cartype" onchange="calcNewPrice()">
+            ${CAR_TYPES.map(c=>`<option value="${c.v}">${c.l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aloqa telefoni</label>
+        <input class="form-input" id="n-phone" type="tel" placeholder="+998" value="+998">
+        <div class="form-hint">Haydovchi siz bilan bog'lanadi</div>
+      </div>
+    </div>
+
+    <!-- Price calc -->
+    <div class="price-box" id="price-box">
+      <div class="price-row"><span class="price-row-label">Masofa:</span><span class="price-row-val" id="pc-dist">— km</span></div>
+      <div class="price-row"><span class="price-row-label">Taxminiy yo'l vaqti:</span><span class="price-row-val" id="pc-hours">— soat</span></div>
+      <div class="price-row"><span class="price-row-label">Tavsiya etilgan narx:</span><span class="price-total" id="pc-price">—</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💰 Narx va qo'shimcha</div>
+      <div class="form-group">
+        <label class="form-label">Narx (so'm)</label>
+        <input class="form-input" type="number" id="n-price" placeholder="0">
+        <div class="form-hint">Hisoblangan narxni o'zgartiring yoki qoldiring</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Izoh (ixtiyoriy)</label>
+        <textarea class="form-input" id="n-note" rows="2" placeholder="Qo'shimcha talablar..." style="resize:none"></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-black" onclick="submitListing()" style="margin-bottom:8px">🚀 Yuk joylash</button>
+    <div style="font-size:11px;color:var(--secondary);text-align:center">E'lon joylangandan so'ng dispecher haydovchi tayinlaydi</div>`;
+  calcNewPrice();
+}
+function calcNewPrice(){
+  const from=document.getElementById('n-from')?.value;
+  const to=document.getElementById('n-to')?.value;
+  const w=parseFloat(document.getElementById('n-weight')?.value)||10;
+  const ct=document.getElementById('n-cartype')?.value||'fura';
+  if(!from||!to)return;
+  const dist=DISTANCES[`${from}-${to}`]||DISTANCES[`${to}-${from}`]||400;
+  const hrs=Math.round(dist/80*10)/10;
+  const price=calcPrice(from,to,w,ct);
+  document.getElementById('pc-dist').textContent=dist+' km';
+  document.getElementById('pc-hours').textContent=hrs+' soat';
+  document.getElementById('pc-price').textContent=fmoney(price);
+  document.getElementById('n-price').value=price;
+}
+function submitListing(){
+  const from=document.getElementById('n-from').value;
+  const to=document.getElementById('n-to').value;
+  const cargo=document.getElementById('n-cargo').value.trim();
+  const weight=parseFloat(document.getElementById('n-weight').value)||10;
+  const carType=document.getElementById('n-cartype').value;
+  const phone=document.getElementById('n-phone').value.trim();
+  const price=parseInt(document.getElementById('n-price').value)||calcPrice(from,to,weight,carType);
+  if(!cargo){toast('Yuk nomini kiriting!');return;}
+  if(from===to){toast('Shaharlar bir xil bo\'lmasin!');return;}
+  const db=loadDB();
+  const listing={
+    id:genId(),from,to,cargo,weight,carType,price,
+    contactPhone:phone,status:'open',matchedDriverId:null,
+    createdAt:Date.now(),customerCompanyId:MY_CID,
+    customerCompanyName:db.customerCompany?.name||'',
+  };
+  db.freightListings.unshift(listing);
+  saveDB(db);
+  toast('✅ Yuk e\'loni joylashtirildi!');
+  // Reset form
+  document.getElementById('n-cargo').value='';
+  document.getElementById('n-note').value='';
+  showPage('orders');
+}
+
+// ═══════════════════════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════════════════════
+function renderOrders(){
+  const db=loadDB();
+  const myOrders=db.orders; // demo
+  const myListings=db.freightListings; // demo
+
+  document.getElementById('orders-body').innerHTML=`
+    <div class="tabs" id="orders-tabs">
+      <button class="tab active" onclick="switchOrdersTab('orders',this)">Buyurtmalar (${myOrders.length})</button>
+      <button class="tab" onclick="switchOrdersTab('listings',this)">E'lonlar (${myListings.length})</button>
+    </div>
+    <div id="orders-orders">
+      ${myOrders.length?myOrders.map(o=>`
+        <div class="order-card" onclick="openOrderDetail('${o.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div class="order-route">${o.from} → ${o.to}</div>
+            <span class="badge ${statusCls(o.status)}">${statusLabel(o.status)}</span>
+          </div>
+          <div class="order-meta">${o.cargo} • ${o.weight}t • ${carLabel(o.carType)} • ${timeAgo(o.createdAt)}</div>
+          <div class="order-footer">
+            ${o.status==='delivered'&&!o.rated?`<button class="btn btn-sm" style="background:#FEF3C7;color:#92400E;border:none;cursor:pointer" onclick="event.stopPropagation();rateDriver('${o.id}')">⭐ Baholash</button>`:'<span></span>'}
+            <span class="order-price">${fmoney(o.price)}</span>
+          </div>
+        </div>`).join(''):'<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Buyurtmalar yo\'q</div></div>'}
+    </div>
+    <div id="orders-listings" style="display:none">
+      ${myListings.length?myListings.map(l=>`
+        <div class="order-card">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div class="order-route">${l.from} → ${l.to}</div>
+            <span class="badge ${l.status==='open'?'bg-yellow':l.status==='matched'?'bg-green':'bg-gray'}">${l.status==='open'?'Kutilmoqda':l.status==='matched'?'Biriktirildi':'Yopiq'}</span>
+          </div>
+          <div class="order-meta">${l.cargo} • ${l.weight}t • ${timeAgo(l.createdAt)}</div>
+          <div class="order-footer">
+            ${l.status==='open'?`<button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:none;cursor:pointer" onclick="cancelListing('${l.id}')">✕ Bekor qilish</button>`:'<span></span>'}
+            <span class="order-price">${fmoney(l.price)}</span>
+          </div>
+        </div>`).join(''):'<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">E\'lonlar yo\'q</div></div>'}
+    </div>`;
+}
+function switchOrdersTab(tab,btn){
+  document.getElementById('orders-orders').style.display=tab==='orders'?'block':'none';
+  document.getElementById('orders-listings').style.display=tab==='listings'?'block':'none';
+  document.querySelectorAll('#orders-tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function cancelListing(id){
+  if(!confirm('E\'lonni bekor qilasizmi?'))return;
+  const db=loadDB();
+  const l=db.freightListings.find(x=>x.id===id);
+  if(l)l.status='cancelled';
+  saveDB(db);toast('E\'lon bekor qilindi');renderOrders();
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPANY SETTINGS
+// ═══════════════════════════════════════════════════════
+function renderCompany(){
+  const db=loadDB();
+  const cc=db.customerCompany||{};
+  document.getElementById('company-body').innerHTML=`
+    <!-- Invite promo -->
+    <div class="alert alert-green" style="margin-bottom:16px">
+      <div class="alert-icon">🚀</div>
+      <div>
+        <div class="alert-title">Platformadan to'liq foydalaning</div>
+        <div class="alert-body">Kompaniyangizni sozlang — dispetcherlar va haydovchilar sizning logistika bo'limingizni platforma orqali boshqarsin.</div>
+      </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="card">
+      <div class="card-title">🏢 Kompaniya profili</div>
+      <div class="logo-upload" id="logo-upload-btn" onclick="document.getElementById('fi-logo').click()">
+        <div class="logo-preview" id="logo-preview">
+          ${cc.logoDataUrl?`<img src="${cc.logoDataUrl}" alt="logo">`:`<span style="font-size:28px">${cc.name?cc.name[0]:'🏢'}</span>`}
+        </div>
+        <div class="logo-upload-label">Kompaniya logosi</div>
+        <div class="logo-upload-hint">Bosing yoki sudrab keling • WebP • 300×300 tavsiya</div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Kompaniya nomi</label>
+        <input class="form-input" id="cc-name" value="${cc.name||''}" placeholder="Navoiy Savdo MChJ">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefon</label>
+          <input class="form-input" id="cc-phone" value="${cc.phone||''}" placeholder="+998" type="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">INN / STIR</label>
+          <input class="form-input" id="cc-bin" value="${cc.bin||''}" placeholder="123456789">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Manzil</label>
+        <input class="form-input" id="cc-address" value="${cc.address||''}" placeholder="Shahar, ko'cha, uy">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aloqa shaxsi</label>
+        <input class="form-input" id="cc-contact" value="${cc.contactPerson||''}" placeholder="Ismingiz va lavozimingiz">
+      </div>
+      <button class="btn btn-black" onclick="saveCompany()">💾 Saqlash</button>
+    </div>
+
+    <!-- Platform section -->
+    <div class="card">
+      <div class="card-title">⚙️ Platforma sozlamalari</div>
+      <div style="padding:10px 0;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--secondary)">Tarif rejasi</span>
+        <span class="badge bg-gray">Bepul</span>
+      </div>
+      <div style="padding:10px 0;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--secondary)">Joylashtirish limiti</span>
+        <span style="font-size:13px;font-weight:600">Cheksiz (beta)</span>
+      </div>
+      <div style="padding:10px 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--secondary)">Havola ulashish</span>
+        <button style="padding:6px 12px;border-radius:8px;background:#F3F4F6;border:none;font-size:12px;font-weight:600;cursor:pointer" onclick="shareLink()">🔗 Ulashish</button>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="card">
+      <div class="card-title">ℹ️ Qanday ishlaydi?</div>
+      <div class="timeline">
+        ${[
+          ['Yuk joylash','➕ tab orqali yunalish, og\'irlik va narxni kiriting'],
+          ['Dispecher tayinlaydi','Kompaniya dispecher haydovchi tanlaydi'],
+          ['Haydovchi olib ketadi','Yuk olinadi, siz progress ko\'rasiz'],
+          ['Manzilga yetkaziladi','Yetkazib berilgach baholang'],
+        ].map(([t,s],i,a)=>`<div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot done"></div>
+            ${i<a.length-1?`<div class="tl-line done"></div>`:''}
+          </div>
+          <div class="tl-content"><div class="tl-title">${t}</div><div class="tl-sub">${s}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+function saveCompany(){
+  const db=loadDB();
+  if(!db.customerCompany) db.customerCompany={id:'cust_001'};
+  db.customerCompany.name=document.getElementById('cc-name').value;
+  db.customerCompany.phone=document.getElementById('cc-phone').value;
+  db.customerCompany.bin=document.getElementById('cc-bin').value;
+  db.customerCompany.address=document.getElementById('cc-address').value;
+  db.customerCompany.contactPerson=document.getElementById('cc-contact').value;
+  saveDB(db);
+  // Update topbar
+  if(db.customerCompany.name){ document.getElementById('tb-name').innerHTML=`${db.customerCompany.name} <span>· Yuk beruvchi</span>`; document.getElementById('tb-logo-letter').textContent=db.customerCompany.name[0]; }
+  toast('✅ Kompaniya ma\'lumotlari saqlandi!');
+}
+function shareLink(){
+  const link='https://t.me/karvandor_cargo_bot';
+  if(navigator.share){ navigator.share({title:'Karvandor — Yuk beruvchi',url:link}); }
+  else{ navigator.clipboard?.writeText(link).then(()=>toast('Havola nusxalandi!')); }
+}
+
+// Logo upload
+document.getElementById('fi-logo').addEventListener('change', async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  toast('Logo siqilmoqda...',3000);
+  const url=await compressImg(f,300,0.80);
+  const db=loadDB();
+  if(!db.customerCompany)db.customerCompany={id:'cust_001'};
+  db.customerCompany.logoDataUrl=url;
+  saveDB(db);
+  document.getElementById('logo-preview').innerHTML=`<img src="${url}" alt="logo">`;
+  document.getElementById('tb-logo').innerHTML=`<img src="${url}" alt="logo">`;
+  toast('✅ Logo yuklandi!');
+  e.target.value='';
+});
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+function renderNotifs(){
+  const db=loadDB();
+  db.notifications.filter(n=>n.roles.includes('cargo')).forEach(n=>n.read=true);
+  saveDB(db);
+  document.getElementById('notif-dot').style.display='none';
+  const list=db.notifications.filter(n=>n.roles.includes('cargo'));
+  document.getElementById('notifs-body').innerHTML=`
+    <div class="section-hdr">Bildirishnomalar</div>
+    ${list.length?`<div class="card" style="padding:0 16px">
+      ${list.map(n=>`<div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #F3F4F6">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:5px;flex-shrink:0"></div>
+        <div>
+          <div style="font-size:13px">${n.text}</div>
+          <div style="font-size:11px;color:var(--secondary);margin-top:2px">${timeAgo(n.ts)}</div>
+        </div>
+      </div>`).join('')}
+    </div>`:'<div class="empty"><div class="empty-icon">🔔</div><div class="empty-title">Bildirishnomalar yo\'q</div></div>'}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+(function init(){
+  renderHome();
+  try{ new BroadcastChannel('karvandor').addEventListener('message',()=>{if(CUR==='home')renderHome();}); }catch{}
+})();
+</script>
+</body>
+</html>
